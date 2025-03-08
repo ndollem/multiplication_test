@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplication Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .option-button {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .option-button:active {
+            transform: scale(0.98);
+        }
+
+        .timer-container {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .progress {
+            height: 12px;
+            border-radius: 6px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease;
+            background-color: #007bff;
+        }
+
+        .stats-container {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .checkbox-wrapper {
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .custom-checkbox {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .custom-checkbox:hover {
+            background-color: #e7f1ff;
+        }
+
+        .custom-checkbox.selected {
+            background-color: #007bff;
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .streak-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: #28a745;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-icon {
+            position: absolute;
+            right: 10px;
+            top: 10%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+
+        .option-button {
+            position: relative;
+            padding-right: 45px;  /* Make room for the icon */
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pop-in {
+            animation: popIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Streak Badge (Initially Hidden) -->
+        <div id="streak-badge" class="streak-badge d-none">
+            Streak: <span id="streak-count">0</span> 🔥
+        </div>
+
+        <!-- Setup Section -->
+        <div id="setup-section" class="card p-4 fade-in">
+            <h2 class="text-center mb-4">Multiplication Quiz</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Select multiplication number(s):</h5>
+                    <div id="number-selection" class="d-flex flex-wrap justify-content-center">
+                        <!-- Numbers will be generated here -->
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5>Number of questions:</h5>
+                    <select class="form-select form-select-lg mb-3" id="quiz-count">
+                        <option value="10">10 questions</option>
+                        <option value="20">20 questions</option>
+                        <option value="30">30 questions</option>
+                        <option value="40">40 questions</option>
+                        <option value="50">50 questions</option>
+                    </select>
+                    <div class="stats-container">
+                        <h6>Your Statistics</h6>
+                        <p>Best Score: <span id="best-score">-</span></p>
+                        <p>Average Time: <span id="avg-time">-</span></p>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-lg w-100 mt-3" id="start-quiz">Start Quiz</button>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz-section" class="card p-4 mt-4 d-none fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>Question <span id="current-question">1</span> of <span id="total-questions"></span></h4>
+                <div class="timer-container">
+                    Time: <span id="timer">5</span>s
+                </div>
+            </div>
+            <div class="progress mb-4">
+                <div class="progress-bar" id="quiz-progress" role="progressbar"></div>
+            </div>
+            <div id="question-container" class="text-center"></div>
+            <div id="options-container" class="d-grid gap-3 mt-4"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="card p-4 mt-4 d-none fade-in">
+            <!-- Results will be displayed here -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
