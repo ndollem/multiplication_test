@@ -135,6 +135,29 @@
         .pop-in {
             animation: popIn 0.3s ease-out forwards;
         }
+
+        .btn-group .btn {
+            padding: 15px;
+            font-weight: 500;
+        }
+
+        .btn-check:checked + .btn-outline-success {
+            background-color: #198754;
+            border-color: #198754;
+            color: white;
+        }
+
+        .btn-check:checked + .btn-outline-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: black;
+        }
+
+        .btn-check:checked + .btn-outline-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -167,6 +190,28 @@
                         <h6>Your Statistics</h6>
                         <p>Best Score: <span id="best-score">-</span></p>
                         <p>Average Time: <span id="avg-time">-</span></p>
+                    </div>
+                </div>
+            </div>
+            <!-- Inside the setup-section, after the number selection and before the question count -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-6 text-center">
+                    <h5>Select difficulty level:</h5>
+                    <div class="btn-group w-100" role="group" id="level-selection">
+                        <input type="radio" class="btn-check" name="level" id="level-easy" value="easy" checked>
+                        <label class="btn btn-outline-success" for="level-easy">
+                            Easy
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="level" id="level-medium" value="medium">
+                        <label class="btn btn-outline-warning" for="level-medium">
+                            Medium
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="level" id="level-hard" value="hard">
+                        <label class="btn btn-outline-danger" for="level-hard">
+                            Hard
+                        </label>
                     </div>
                 </div>
             </div>
