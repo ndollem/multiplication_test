@@ -10,6 +10,9 @@ let streak = 0;
 let correctStreak = 0;
 let questionStartTime = 0;
 let averageResponseTime = 0;
+let quizLevel = 'easy';
+let timePerQuestion = 15; // Default for easy level
+
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
@@ -53,6 +56,20 @@ function startQuiz() {
 
     questionCount = parseInt(document.getElementById('quiz-count').value);
     document.getElementById('total-questions').textContent = questionCount;
+
+    // Get selected level and set time
+    quizLevel = document.querySelector('input[name="level"]:checked').value;
+    switch(quizLevel) {
+        case 'easy':
+            timePerQuestion = 15;
+            break;
+        case 'medium':
+            timePerQuestion = 10;
+            break;
+        case 'hard':
+            timePerQuestion = 5;
+            break;
+    }
     
     generateQuestions();
     document.getElementById('setup-section').classList.add('d-none');
@@ -153,7 +170,7 @@ function showQuestion() {
 
 function resetTimer() {
     clearInterval(timer);
-    let timeLeft = 5;
+    let timeLeft = timePerQuestion;
     const timerElement = document.getElementById('timer');
     timerElement.textContent = timeLeft;
     timerElement.classList.remove('timer-warning');
@@ -162,8 +179,8 @@ function resetTimer() {
         timeLeft--;
         timerElement.textContent = timeLeft;
         
-        // Add warning color when time is running out
-        if (timeLeft <= 2) {
+        // Add warning color when time is running low
+        if (timeLeft <= Math.ceil(timePerQuestion * 0.3)) { // Warning at 30% time remaining
             timerElement.classList.add('timer-warning');
         }
         
@@ -291,6 +308,8 @@ function showResults() {
             </div>
             <div class="stats-container">
                 <h4>Quiz Statistics</h4>
+                <p>Difficulty Level: ${quizLevel.charAt(0).toUpperCase() + quizLevel.slice(1)}</p>
+                <p>Time per question: ${timePerQuestion} seconds</p>
                 <p>Time taken: ${timeTaken} seconds</p>
                 <p>Average response time: ${Math.round(averageResponseTime)} seconds per question</p>
                 <p>Correct answers: ${Math.round(score / (100 / questionCount))} out of ${questionCount}</p>
