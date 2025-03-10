@@ -267,6 +267,11 @@ function hideStreak() {
 function showResults() {
     const timeTaken = Math.round((Date.now() - startTime) / 1000);
     const finalScore = Math.round(score);
+
+    // Format selected numbers for display
+    const selectedNumbersText = selectedNumbers
+        .sort((a, b) => a - b) // Sort numbers in ascending order
+        .join(', ');
     
     // Update best score
     const currentBest = localStorage.getItem('bestScore') || 0;
@@ -308,6 +313,7 @@ function showResults() {
             </div>
             <div class="stats-container">
                 <h4>Quiz Statistics</h4>
+                <p>Multiplication Tables: ${selectedNumbersText}</p>
                 <p>Difficulty Level: ${quizLevel.charAt(0).toUpperCase() + quizLevel.slice(1)}</p>
                 <p>Time per question: ${timePerQuestion} seconds</p>
                 <p>Time taken: ${timeTaken} seconds</p>
