@@ -13,6 +13,27 @@ let averageResponseTime = 0;
 let quizLevel = 'easy';
 let timePerQuestion = 15; // Default for easy level
 
+// Add these global variables
+const DIFFICULTY_SETTINGS = {
+    easy: {
+        timePerQuestion: 15,
+        easyMultiplierChance: 0.3, // 30% chance for x1, x2, x10
+        consecutiveEasyLimit: 2,    // Max consecutive easy questions
+        multiplierRange: {min: 1, max: 10}
+    },
+    medium: {
+        timePerQuestion: 10,
+        easyMultiplierChance: 0.15, // 15% chance for x1, x2, x10
+        consecutiveEasyLimit: 1,     // Max 1 consecutive easy question
+        multiplierRange: {min: 2, max: 9}
+    },
+    hard: {
+        timePerQuestion: 5,
+        easyMultiplierChance: 0.05, // 5% chance for x1, x2, x10
+        consecutiveEasyLimit: 0,     // No consecutive easy questions
+        multiplierRange: {min: 3, max: 9}
+    }
+};
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
@@ -59,17 +80,7 @@ function startQuiz() {
 
     // Get selected level and set time
     quizLevel = document.querySelector('input[name="level"]:checked').value;
-    switch(quizLevel) {
-        case 'easy':
-            timePerQuestion = 15;
-            break;
-        case 'medium':
-            timePerQuestion = 10;
-            break;
-        case 'hard':
-            timePerQuestion = 5;
-            break;
-    }
+    timePerQuestion = DIFFICULTY_SETTINGS[quizLevel].timePerQuestion;
     
     generateQuestions();
     document.getElementById('setup-section').classList.add('d-none');
@@ -89,28 +100,87 @@ function updateStatistics() {
 
 function generateQuestions() {
     questions = [];
+    let previousQuestion = null;
+    let consecutiveEasyQuestions = 0;
+    const settings = DIFFICULTY_SETTINGS[quizLevel];
+
+    const isEasyMultiplier = (num) => [1, 2, 10].includes(num);
+    const usedCombinations = new Set(); // Track used number combinations
+
     for (let i = 0; i < questionCount; i++) {
-        // Select random number from selected numbers
-        const baseNumber = selectedNumbers[Math.floor(Math.random() * selectedNumbers.length)];
-        // Generate multiplier between 1 and 10
-        const multiplier = Math.floor(Math.random() * 10) + 1;
-        const correctAnswer = baseNumber * multiplier;
-        
-        // Generate wrong answers that make sense
+        let baseNumber, multiplier, correctAnswer;
+        let isValidQuestion = false;
+
+        while (!isValidQuestion) {
+            baseNumber = selectedNumbers[Math.floor(Math.random() * selectedNumbers.length)];
+            
+            // Determine if this should be an easy multiplication
+            const allowEasy = Math.random() < settings.easyMultiplierChance && 
+                            consecutiveEasyQuestions < settings.consecutiveEasyLimit;
+
+            if (allowEasy) {
+                // Generate easy multiplier (1, 2, or 10)
+                const easyMultipliers = [1, 2, 10];
+                multiplier = easyMultipliers[Math.floor(Math.random() * easyMultipliers.length)];
+            } else {
+                // Generate multiplier within difficulty range, excluding easy multipliers
+                let validMultipliers = [];
+                for (let m = settings.multiplierRange.min; m <= settings.multiplierRange.max; m++) {
+                    if (!isEasyMultiplier(m)) {
+                        validMultipliers.push(m);
+                    }
+                }
+                multiplier = validMultipliers[Math.floor(Math.random() * validMultipliers.length)];
+            }
+
+            correctAnswer = baseNumber * multiplier;
+            const combination = `${baseNumber}x${multiplier}`;
+
+            // Check if this is a valid question
+            isValidQuestion = 
+                // Not used before
+                !usedCombinations.has(combination) &&
+                // Not the same as previous question
+                (!previousQuestion || 
+                    previousQuestion.baseNumber !== baseNumber || 
+                    previousQuestion.multiplier !== multiplier) &&
+                // Not the reverse of previous question (e.g., 3x4 after 4x3)
+                (!previousQuestion ||
+                    !(previousQuestion.baseNumber === multiplier && 
+                      previousQuestion.multiplier === baseNumber));
+        }
+
+        // Update tracking variables
+        usedCombinations.add(`${baseNumber}x${multiplier}`);
+        consecutiveEasyQuestions = isEasyMultiplier(multiplier) ? consecutiveEasyQuestions + 1 : 0;
+
+        // Generate wrong answers with improved strategy
         let options = [correctAnswer];
         while (options.length < 4) {
             let wrongAnswer;
             const randomStrategy = Math.random();
             
-            if (randomStrategy < 0.3) {
-                // Close to correct answer
-                wrongAnswer = correctAnswer + (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
-            } else if (randomStrategy < 0.6) {
+            if (randomStrategy < 0.4) {
                 // Common multiplication mistakes
-                wrongAnswer = baseNumber * (multiplier + (Math.random() < 0.5 ? 1 : -1));
+                const mistakes = [
+                    baseNumber * (multiplier + 1),    // Next multiplier
+                    baseNumber * (multiplier - 1),    // Previous multiplier
+                    (baseNumber + 1) * multiplier,    // Next base number
+                    (baseNumber - 1) * multiplier,    // Previous base number
+                    baseNumber + multiplier,          // Addition instead of multiplication
+                    Math.abs(baseNumber - multiplier) // Subtraction instead of multiplication
+                ];
+                wrongAnswer = mistakes[Math.floor(Math.random() * mistakes.length)];
+            } else if (randomStrategy < 0.7) {
+                // Close to correct answer
+                const offset = Math.floor(Math.random() * 3) + 1;
+                wrongAnswer = correctAnswer + (Math.random() < 0.5 ? offset : -offset);
             } else {
-                // Random but reasonable answer
-                wrongAnswer = correctAnswer + (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 3);
+                // Reversed digits of correct answer
+                wrongAnswer = parseInt(correctAnswer.toString().split('').reverse().join(''));
+                if (wrongAnswer === correctAnswer) {
+                    wrongAnswer = correctAnswer + (Math.random() < 0.5 ? 1 : -1);
+                }
             }
             
             // Ensure wrong answer is positive and not already in options
@@ -122,13 +192,16 @@ function generateQuestions() {
         // Shuffle options
         options = options.sort(() => Math.random() - 0.5);
         
-        questions.push({
+        const questionObj = {
             question: `${baseNumber} × ${multiplier} = ?`,
             options: options,
             correctAnswer: correctAnswer,
             baseNumber: baseNumber,
             multiplier: multiplier
-        });
+        };
+
+        previousQuestion = questionObj;
+        questions.push(questionObj);
     }
 }
 
