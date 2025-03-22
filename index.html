@@ -164,48 +164,48 @@
     <div class="container mt-5">
         <!-- Streak Badge (Initially Hidden) -->
         <div id="streak-badge" class="streak-badge d-none">
-            Streak: <span id="streak-count">0</span> 🔥
+            Rentetan: <span id="streak-count">0</span> 🔥
         </div>
 
         <!-- Setup Section -->
         <div id="setup-section" class="card p-4 fade-in">
-            <h2 class="text-center mb-4">Multiplication Quiz</h2>
+            <h2 class="text-center mb-4">Kuis Perkalian</h2>
             <div class="row">
                 <div class="col-md-6">
-                    <h5>Select multiplication number(s):</h5>
+                    <h5>Pilih angka perkalian:</h5>
                     <div id="number-selection" class="d-flex flex-wrap justify-content-center">
                         <!-- Numbers will be generated here -->
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h5>Number of questions:</h5>
+                    <h5>Jumlah pertanyaan:</h5>
                     <select class="form-select form-select-lg mb-3" id="quiz-count">
-                        <option value="10">10 questions</option>
-                        <option value="20">20 questions</option>
-                        <option value="30">30 questions</option>
-                        <option value="40">40 questions</option>
-                        <option value="50">50 questions</option>
+                        <option value="10">10 pertanyaan</option>
+                        <option value="20">20 pertanyaan</option>
+                        <option value="30">30 pertanyaan</option>
+                        <option value="40">40 pertanyaan</option>
+                        <option value="50">50 pertanyaan</option>
                     </select>
                 </div>
             </div>
             <!-- Inside the setup-section, after the number selection and before the question count -->
             <div class="row justify-content-center my-4">
                 <div class="col-md-6 text-center">
-                    <h5>Select difficulty level:</h5>
+                    <h5>Pilih tingkat kesulitan:</h5>
                     <div class="btn-group w-100" role="group" id="level-selection">
                         <input type="radio" class="btn-check" name="level" id="level-easy" value="easy" checked>
                         <label class="btn btn-outline-success" for="level-easy">
-                            Easy
+                            Mudah
                         </label>
                         
                         <input type="radio" class="btn-check" name="level" id="level-medium" value="medium">
                         <label class="btn btn-outline-warning" for="level-medium">
-                            Medium
+                            Sedang
                         </label>
                         
                         <input type="radio" class="btn-check" name="level" id="level-hard" value="hard">
                         <label class="btn btn-outline-danger" for="level-hard">
-                            Hard
+                            Sulit
                         </label>
                     </div>
                 </div>
@@ -213,21 +213,21 @@
             <div class="row justify-content-center mb-4">
                 <div class="card col-md-4 text-center">
                     <div class="card-body">
-                        <h6 class="card-title">Your Previous Statistics</h6>
-                        <p class="card-text">Best Score: <span id="best-score">-</span></p>
-                        <p class="card-text">Average Time: <span id="avg-time">-</span></p>
+                        <h6 class="card-title">Statistik Sebelumnya</h6>
+                        <p class="card-text">Skor Terbaik: <span id="best-score">-</span></p>
+                        <p class="card-text">Waktu Rata-rata: <span id="avg-time">-</span></p>
                     </div>
                 </div>
             </div>
-            <button class="btn btn-primary btn-lg w-100 mt-3" id="start-quiz">Start Quiz</button>
+            <button class="btn btn-primary btn-lg w-100 mt-3" id="start-quiz">Mulai Kuis</button>
         </div>
 
         <!-- Quiz Section -->
         <div id="quiz-section" class="card p-4 mt-4 d-none fade-in">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4>Question <span id="current-question">1</span> of <span id="total-questions"></span></h4>
+                <h4>Pertanyaan <span id="current-question">1</span> dari <span id="total-questions"></span></h4>
                 <div class="timer-container">
-                    Time: <span id="timer">5</span>s
+                    Waktu: <span id="timer">5</span> dtk
                 </div>
             </div>
             <div class="progress mb-4">
