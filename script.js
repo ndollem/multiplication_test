@@ -64,7 +64,7 @@ async function startQuiz() {
             .map(div => parseInt(div.dataset.value));
         
         if (selectedNumbers.length === 0) {
-            showAlert('Please select at least one number!', 'danger');
+            showAlert('Silakan pilih minimal satu angka!', 'danger');
             return;
         }
 
@@ -74,7 +74,7 @@ async function startQuiz() {
         document.getElementById('start-quiz').disabled = true;
         document.getElementById('start-quiz').innerHTML = `
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Preparing Quiz...
+            Mempersiapkan Kuis...
         `;
 
         document.getElementById('total-questions').textContent = questionCount;
@@ -101,19 +101,19 @@ async function startQuiz() {
         }
     } catch (error) {
         console.error('Quiz preparation error:', error);
-        let errorMessage = 'Error preparing quiz. ';
+        let errorMessage = 'Terjadi kesalahan saat menyiapkan kuis. ';
         
         if (error.message === 'Generation timeout') {
-            errorMessage += 'Please try with fewer questions or more numbers.';
+            errorMessage += 'Silakan coba dengan jumlah pertanyaan lebih sedikit atau pilih lebih banyak angka.';
         } else if (error.message === 'Not enough questions generated') {
-            errorMessage += 'Please select more numbers or reduce the number of questions.';
+            errorMessage += 'Silakan pilih lebih banyak angka atau kurangi jumlah pertanyaan.';
         } else {
-            errorMessage += 'Please try again.';
+            errorMessage += 'Silakan coba lagi.';
         }
         
         showAlert(errorMessage, 'danger');
         document.getElementById('start-quiz').disabled = false;
-        document.getElementById('start-quiz').innerHTML = 'Start Quiz';
+        document.getElementById('start-quiz').innerHTML = 'Mulai Kuis';
     }
 }
 
@@ -121,7 +121,7 @@ function updateStatistics() {
     const bestScore = localStorage.getItem('bestScore') || '-';
     const avgTime = localStorage.getItem('averageTime') || '-';
     document.getElementById('best-score').textContent = bestScore !== '-' ? bestScore + '%' : '-';
-    document.getElementById('avg-time').textContent = avgTime !== '-' ? avgTime + 's' : '-';
+    document.getElementById('avg-time').textContent = avgTime !== '-' ? avgTime + ' detik' : '-';
 }
 
 
@@ -277,19 +277,19 @@ function showResults() {
 
     let status, alertClass, emoji;
     if (finalScore >= 91) {
-        status = 'Excellent!';
+        status = 'Sempurna!';
         alertClass = 'alert-success';
         emoji = '🏆';
     } else if (finalScore >= 71) {
-        status = 'Good';
+        status = 'Bagus';
         alertClass = 'alert-info';
         emoji = '👍';
     } else if (finalScore >= 61) {
-        status = 'Fair';
+        status = 'Cukup';
         alertClass = 'alert-warning';
         emoji = '😊';
     } else {
-        status = 'Failed';
+        status = 'Gagal';
         alertClass = 'alert-danger';
         emoji = '😢';
     }
@@ -305,16 +305,16 @@ function showResults() {
                 <h3 class="mb-3">${status}</h3>
             </div>
             <div class="stats-container">
-                <h4>Quiz Statistics</h4>
-                <p>Multiplication Tables: ${selectedNumbersText}</p>
-                <p>Difficulty Level: ${quizLevel.charAt(0).toUpperCase() + quizLevel.slice(1)}</p>
-                <p>Time per question: ${timePerQuestion} seconds</p>
-                <p>Time taken: ${timeTaken} seconds</p>
-                <p>Average response time: ${Math.round(averageResponseTime)} seconds per question</p>
-                <p>Correct answers: ${Math.round(score / (100 / questionCount))} out of ${questionCount}</p>
-                <p>Longest streak: ${correctStreak} correct in a row</p>
+                <h4>Statistik Kuis</h4>
+                <p>Tabel Perkalian: ${selectedNumbersText}</p>
+                <p>Tingkat Kesulitan: ${translateDifficulty(quizLevel)}</p>
+                <p>Waktu per pertanyaan: ${timePerQuestion} detik</p>
+                <p>Waktu yang digunakan: ${timeTaken} detik</p>
+                <p>Waktu respons rata-rata: ${Math.round(averageResponseTime)} detik per pertanyaan</p>
+                <p>Jawaban benar: ${Math.round(score / (100 / questionCount))} dari ${questionCount}</p>
+                <p>Rentetan terpanjang: ${correctStreak} benar berturut-turut</p>
             </div>
-            <button class="btn btn-primary btn-lg mt-4" onclick="location.reload()">Try Again</button>
+            <button class="btn btn-primary btn-lg mt-4" onclick="location.reload()">Coba Lagi</button>
         </div>
     `;
 }
@@ -402,4 +402,14 @@ async function generateQuestionsAsync() {
     }
 
     return questions;
+}
+
+// Tambahkan fungsi untuk menerjemahkan tingkat kesulitan
+function translateDifficulty(level) {
+    switch(level) {
+        case 'easy': return 'Mudah';
+        case 'medium': return 'Sedang';
+        case 'hard': return 'Sulit';
+        default: return level;
+    }
 }
